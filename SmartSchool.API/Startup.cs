@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -42,11 +43,14 @@ namespace SmartSchool.API
                 }
             );
 
-            services.AddScoped<IRepository, Repository>();
 
             services.AddRazorPages().AddNewtonsoftJson(
                 opt => opt.SerializerSettings.ReferenceLoopHandling =
                     Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        
+            services.AddScoped<IRepository, Repository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

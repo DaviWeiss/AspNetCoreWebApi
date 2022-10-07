@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartSchool.API.Controllers.Models;
 using SmartSchool.API.Data;
+using SmartSchool.API.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +17,10 @@ namespace SmartSchool.API.Controllers
     public class AlunoController : ControllerBase
     {
         public readonly IRepository _repo;
-        public AlunoController(IRepository repo)
+        private readonly IMapper _mapper;
+        public AlunoController(IRepository repo, IMapper mapper)
         {
+            _mapper = mapper;
             _repo = repo;
         }
 
@@ -33,63 +37,71 @@ namespace SmartSchool.API.Controllers
             //    return Ok(aluno);
             //}
 
-            var result = _repo.GetAllAlunos(true);
+            var alunos = _repo.GetAllAlunos(true);
+            
 
-            return Ok(result);
+            return Ok(_mapper.Map<IEnumerable<AlunoDto>>(alunos));
         }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var aluno = _repo.GetAlunoById(id, false);
+            var aluno = _repo.GetAlunoById(id, true);
             if (aluno == null)
             {
                 return BadRequest("O aluno especificado não foi encontrado");
             }
 
-            return Ok(aluno);
+            var alunoDto = _mapper.Map<AlunoDto>(aluno);
+
+            return Ok(alunoDto);
         }
 
         [HttpPost()]
-        public IActionResult Post(Aluno aluno)
+        public IActionResult Post(AlunoRegistrarDto model)
         {
             //bool exists = _context.Alunos.Any(s => s.Id == aluno.Id);
 
             //if (exists) return Conflict("Já existe um aluno com esse Id.");
+            var aluno = _mapper.Map<Aluno>(model);
+            
             _repo.Add(aluno);
             if (_repo.SaveChanges())
             {
-                return Ok(aluno);
+                return Created($"/api/aluno/{model.Id}", _mapper.Map<AlunoDto>(aluno));
             }
 
             return BadRequest("Aluno não cadastrado");
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Aluno aluno)
+        public IActionResult Put(int id, AlunoRegistrarDto model)
         {
-            var alu = _repo.GetAlunoById(id);
-            if (alu == null) return BadRequest("Aluno não encontrado");
+            var aluno = _repo.GetAlunoById(id);
+            if (aluno == null) return BadRequest("Aluno não encontrado");
+
+            _mapper.Map(model, aluno);
 
             _repo.Update(aluno);
             if (_repo.SaveChanges())
             {
-                return Ok(aluno);
+                return Created($"/api/aluno/{model.Id}", _mapper.Map<AlunoDto>(aluno));
             }
 
             return BadRequest("Aluno não modificado");
         }
 
         [HttpPatch("{id}")]
-        public IActionResult Patch(int id, Aluno aluno)
+        public IActionResult Patch(int id, AlunoRegistrarDto model)
         {
-            var alu = _repo.GetAlunoById(id);
-            if (alu == null) return BadRequest("Aluno não encontrado");
+            var aluno = _repo.GetAlunoById(id);
+            if (aluno == null) return BadRequest("Aluno não encontrado");
+            _mapper.Map(model, aluno);
 
             _repo.Update(aluno);
             if (_repo.SaveChanges())
             {
-                return Ok(aluno);
+                return Created($"/api/aluno/{model.Id}", _mapper.Map<AlunoDto>(aluno));
             }
 
             return BadRequest("Aluno não modificado");
@@ -98,10 +110,10 @@ namespace SmartSchool.API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var alu = _repo.GetAlunoById(id);
-            if (alu == null) return BadRequest("Aluno não encontrado");
+            var aluno = _repo.GetAlunoById(id);
+            if (aluno == null) return BadRequest("Aluno não encontrado");
             
-            _repo.Delete(alu);
+            _repo.Delete(aluno);
             if (_repo.SaveChanges())
             {
                 return Ok("Aluno deletado");
