@@ -1,20 +1,11 @@
-﻿using System.Collections;
+﻿using SmartSchool.API.Models;
 using System.Collections.Generic;
+using System;
 
-namespace SmartSchool.API.Models
+namespace SmartSchool.API.Dtos
 {
-    public class Disciplina
+    public class DisciplinaRegistrarDto
     {
-        public Disciplina() {}
-
-        public Disciplina(int id, string nome, int professorId, int cursoId)
-        {
-            this.Id = id;
-            this.Nome = nome;
-            this.ProfessorId = professorId;
-            this.CursoId = cursoId;
-        }
-
         public int Id { get; set; }
 
         public string Nome { get; set; }
@@ -31,8 +22,5 @@ namespace SmartSchool.API.Models
         public int CursoId { get; set; }
 
         public Curso Curso { get; set; }
-
-        
-        public IEnumerable<AlunoDisciplina> AlunosDisciplinas { get; set; }
     }
 }

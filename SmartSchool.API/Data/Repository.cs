@@ -5,7 +5,6 @@ using SmartSchool.API.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SmartSchool.API.Data
 {
@@ -118,6 +117,28 @@ namespace SmartSchool.API.Data
             return query.FirstOrDefault();
         }
 
+
+        public async Task<PageList<Professor>> GetAllProfessoresAsync(PageParams pageParams)
+        {
+            IQueryable<Professor> query = _context.Professores;
+
+            query = query.AsNoTracking()
+                    .OrderBy(a => a.Id);
+
+
+            if (!string.IsNullOrEmpty(pageParams.Nome))
+                query = query.Where(professor => professor.Nome.ToUpper().Contains(pageParams.Nome.ToUpper()) ||
+                professor.SobreNome.ToUpper().Contains(pageParams.Nome.ToUpper()));
+
+            if (pageParams.Registro > 0)
+                query = query.Where(professor => professor.Registro == pageParams.Registro);
+
+            if (pageParams.Ativo != null)
+                query = query.Where(professor => professor.Ativo == (pageParams.Ativo != 0));
+            /// return await query.ToListAsync();
+
+            return await PageList<Professor>.CreateAsync(query, pageParams.PageNumber, pageParams.PageSize);
+        }
         public Professor[] GetAllProfessores(bool includeAluno = false)
         {
             IQueryable<Professor> query = _context.Professores;
@@ -167,6 +188,32 @@ namespace SmartSchool.API.Data
             query = query.AsNoTracking()
                           .OrderBy(aluno => aluno.Id)
                           .Where(professor => professor.Id == professorId);
+
+            return query.FirstOrDefault();
+        }
+        public async Task<PageList<Disciplina>> GetAllDsiciplinasAsync(PageParams pageParams)
+        {
+            IQueryable<Disciplina> query = _context.Disciplinas;
+
+            query = query.AsNoTracking()
+                    .OrderBy(a => a.Id);
+
+            if (!string.IsNullOrEmpty(pageParams.NomeDisciplina))
+                query = query.Where(disciplina => disciplina.Nome.ToUpper().Contains(pageParams.NomeDisciplina.ToUpper()));
+
+            if (pageParams.idDisciplina > 0)
+                query = query.Where(professor => professor.Id == pageParams.idDisciplina);
+
+            return await PageList<Disciplina>.CreateAsync(query, pageParams.PageNumber, pageParams.PageSize);
+        }
+
+        public Disciplina GetDisciplinaById(int disciplinaId)
+        {
+            IQueryable<Disciplina> query = _context.Disciplinas;
+
+            query = query.AsNoTracking()
+                          .OrderBy(disciplina => disciplina.Id)
+                          .Where(disciplina => disciplina.Id == disciplinaId);
 
             return query.FirstOrDefault();
         }

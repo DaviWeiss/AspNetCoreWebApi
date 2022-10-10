@@ -35,6 +35,11 @@ namespace SmartSchool.API.Controllers.Models
         public DateTime? DataFim { get; set; } = null;
 
         public bool Ativo { get; set; } = true;
+
+
+        //Criada essa variável como Ienumerable, para fazer a ligação com disciplinas, ou seja, essa variável basicamente informa para o banco de dados que
+        //o aluno tal foi criado e que precisa ter uma disciplina associada a ele. Necessário, pois um aluno pode fazer várias disciplinas e uma disciplina pode ter
+        //vários alunos
         public IEnumerable<AlunoDisciplina> AlunosDisciplinas { get; set; }
     }
 }

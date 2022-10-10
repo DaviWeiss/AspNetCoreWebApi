@@ -16,7 +16,13 @@
 
         public int? Matricula { get; set; } = null;
 
+        public int? Registro { get; set; } = null;
+
+        public int? idDisciplina { get; set; } = null;
+
         public string Nome { get; set; } = string.Empty;
+
+        public string? NomeDisciplina { get; set; } = string.Empty;
 
         public int? Ativo { get; set; } = null;
     }
